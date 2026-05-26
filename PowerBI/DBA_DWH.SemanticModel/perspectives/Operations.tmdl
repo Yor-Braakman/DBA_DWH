@@ -1,0 +1,31 @@
+/// Operations perspective for waits, regressions, and top offenders
+perspective Operations
+
+	perspectiveTable DimInterval
+
+	perspectiveTable DimQuery
+
+	perspectiveTable DimPlan
+
+	perspectiveTable FactRuntimeStats
+
+		perspectiveMeasure 'Total Executions'
+
+		perspectiveMeasure 'Avg Duration (ms)'
+
+		perspectiveMeasure 'Avg Logical Reads'
+
+		perspectiveMeasure 'Avg Logical Writes'
+
+		perspectiveMeasure 'Top Query Rank by Duration'
+
+		perspectiveMeasure 'Regression Query Count'
+
+	perspectiveTable FactWaitStats
+
+		perspectiveMeasure 'Total Wait (ms)'
+
+		perspectiveMeasure 'Avg Wait (ms)'
+
+		perspectiveMeasure 'Waits per Execution (ms)'
+

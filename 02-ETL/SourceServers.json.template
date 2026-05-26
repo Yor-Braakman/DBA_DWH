@@ -1,0 +1,63 @@
+{
+    "servers": [
+        {
+            "serverName": "sql-server-01.corp.local",
+            "tenantName": "Tenant_A",
+            "databases": [
+                "Database1",
+                "Database2"
+            ],
+            "useWindowsAuth": true,
+            "comment": "On-premises SQL Server 2019 - Windows Auth"
+        },
+        {
+            "serverName": "azure-sql-server.database.windows.net",
+            "tenantName": "Tenant_B",
+            "databases": [
+                "Production",
+                "Staging"
+            ],
+            "useWindowsAuth": false,
+            "username": "sqladmin@contoso.com",
+            "password": "YourSecurePassword123!",
+            "comment": "Azure SQL Database - SQL Authentication"
+        },
+        {
+            "serverName": "managed-instance.region.database.windows.net",
+            "tenantName": "Tenant_C",
+            "databases": [
+                "CoreDB",
+                "ReportingDB"
+            ],
+            "useWindowsAuth": false,
+            "username": "mireadmin",
+            "password": "MIPassword456!",
+            "comment": "Azure SQL Managed Instance"
+        },
+        {
+            "serverName": "secondary-server\\SQLEXPRESS",
+            "tenantName": "Tenant_D",
+            "databases": [
+                "OperationalDB"
+            ],
+            "useWindowsAuth": true,
+            "comment": "Named instance on on-premises server"
+        }
+    ],
+    "_comments": {
+        "serverName": "Full server name or IP. Format: 'server.domain.local', 'server\\INSTANCE', or 'server.database.windows.net'",
+        "tenantName": "Logical grouping identifier - no spaces, use underscores",
+        "databases": "Array of database names to extract Query Store data from",
+        "useWindowsAuth": "true for Windows/Integrated Auth, false for SQL Server Auth",
+        "username": "Only needed if useWindowsAuth=false. For Azure, use email format: user@domain.com",
+        "password": "Only needed if useWindowsAuth=false. Use strong passwords with special characters",
+        "comment": "Optional field for documentation - remove before running"
+    },
+    "configuration": {
+        "retentionDays": 90,
+        "bulkCopyTimeout": 300,
+        "queryTimeout": 300,
+        "logPath": ".\\Logs",
+        "stagingPath": ".\\Staging"
+    }
+}

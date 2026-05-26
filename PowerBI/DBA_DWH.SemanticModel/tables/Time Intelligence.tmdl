@@ -1,0 +1,26 @@
+table 'Time Intelligence'
+
+	/// Time-intelligence calculation group for interval-based reporting
+	calculationGroup
+		precedence: 20
+
+		/// Base measure value
+		calculationItem Current = SELECTEDMEASURE()
+
+		/// Month-to-date
+		calculationItem MTD = TOTALMTD(SELECTEDMEASURE(), DimInterval[IntervalDate])
+
+		/// Quarter-to-date
+		calculationItem QTD = TOTALQTD(SELECTEDMEASURE(), DimInterval[IntervalDate])
+
+		/// Year-to-date
+		calculationItem YTD = TOTALYTD(SELECTEDMEASURE(), DimInterval[IntervalDate])
+
+		/// Previous month comparison
+		calculationItem 'Previous Period' = CALCULATE(SELECTEDMEASURE(), DATEADD(DimInterval[IntervalDate], -1, MONTH))
+
+	column 'Time Intelligence'
+		dataType: string
+
+	partition 'Partition_Time Intelligence' = calculationGroup
+

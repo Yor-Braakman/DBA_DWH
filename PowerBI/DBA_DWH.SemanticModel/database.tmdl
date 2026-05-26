@@ -1,0 +1,4 @@
+/// Offline semantic model for TGQS query store analytics
+database TGQS_OfflineModel
+	compatibilityLevel: 1700
+

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build">
+  <Sdk Name="Microsoft.Build.Sql" Version="2.1.0" />
+  <PropertyGroup>
+    <Name>DBA_DWH</Name>
+    <ProjectGuid>{8CA85E94-0D1A-4C16-831F-64BC3273324B}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultSchema>qsh</DefaultSchema>
+    <EnableDefaultSqlItems>false</EnableDefaultSqlItems>
+  </PropertyGroup>
+
+  <!-- Schema Objects -->
+  <ItemGroup>
+    <Build Include="Schema\qsh.sql" />
+  </ItemGroup>
+
+  <!-- Table Objects -->
+  <ItemGroup>
+    <Build Include="Tables\RuntimeStatsInterval.sql" />
+    <Build Include="Tables\QueryStoreQuery.sql" />
+    <Build Include="Tables\QueryStoreQueryText.sql" />
+    <Build Include="Tables\QueryStorePlan.sql" />
+    <Build Include="Tables\QueryStoreRuntimeStats.sql" />
+    <Build Include="Tables\QueryStoreWaitStats.sql" />
+    <Build Include="Tables\ETLControl.sql" />
+    <Build Include="Tables\PlanRegressions.sql" />
+  </ItemGroup>
+
+  <!-- View Objects -->
+  <ItemGroup>
+    <Build Include="Views\DimQuery.sql" />
+    <Build Include="Views\DimPlan.sql" />
+    <Build Include="Views\DimInterval.sql" />
+    <Build Include="Views\DimWaitCategory.sql" />
+    <Build Include="Views\FactRuntimeStats.sql" />
+    <Build Include="Views\FactWaitStats.sql" />
+    <Build Include="Views\FactTopQueries.sql" />
+    <Build Include="Views\FactWaitSummary.sql" />
+  </ItemGroup>
+
+  <!-- Procedure Objects -->
+  <ItemGroup>
+    <Build Include="Procedures\sp_MERGE_QueryStoreRuntimeStats.sql" />
+    <Build Include="Procedures\sp_MERGE_QueryStoreWaitStats.sql" />
+    <Build Include="Procedures\sp_MERGE_QueryDimensions.sql" />
+    <Build Include="Procedures\sp_CleanupHistoricalData.sql" />
+    <Build Include="Procedures\sp_MaintainIndexes.sql" />
+    <Build Include="Procedures\sp_UpdateStatistics.sql" />
+    <Build Include="Procedures\sp_AnalyzeStorageUsage.sql" />
+  </ItemGroup>
+
+  <Target Name="BeforeBuild">
+    <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
+  </Target>
+</Project>

@@ -1,0 +1,24 @@
+table DimInterval
+	lineageTag: fa93cf1c-2fbf-4c5c-bde0-596d1e7e4093
+	dataCategory: Time
+
+	column RuntimeStatsIntervalId
+		dataType: int64
+		lineageTag: 7b6cc713-7487-4969-8491-fcef6009848f
+		sourceColumn: RuntimeStatsIntervalId
+
+	column IntervalDate
+		dataType: dateTime
+		isUnique
+		lineageTag: 69d951e9-d415-4f9d-b4b7-0568096ea9da
+		sourceColumn: IntervalDate
+
+	column IntervalDurationMinutes
+		dataType: int64
+		lineageTag: aba06d68-7dd9-4868-839d-32332ed675ca
+		sourceColumn: IntervalDurationMinutes
+
+	partition DimInterval = calculated
+		mode: import
+		source = DATATABLE("RuntimeStatsIntervalId", INTEGER, "IntervalDate", DATETIME, "IntervalDurationMinutes", INTEGER, {{1, DATE(2026,1,1), 1}})
+

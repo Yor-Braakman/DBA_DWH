@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "sqlproj: Build DBA_DWH",
+			"type": "process",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"c:/Source/TGQS/DBA_DWH/DBA_DWH.sqlproj"
+			],
+			"problemMatcher": "$sqlproj-problem-matcher",
+			"isBackground": true,
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "Builds the DBA_DWH SQL project"
+		}
+	]
+}

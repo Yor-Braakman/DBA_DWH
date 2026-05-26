@@ -1,0 +1,72 @@
+table FactWaitStats
+	lineageTag: 387141ce-9fc6-43e4-96ce-f8a56f41719a
+
+	measure 'Total Wait (ms)' = SUM(FactWaitStats[TotalWaitTimeMs])
+		formatString: #,0.00
+		displayFolder: Waits
+		lineageTag: fdbcb608-a9a8-4046-bb6a-97fe4d2c332f
+
+	measure 'Avg Wait (ms)' = AVERAGE(FactWaitStats[AvgWaitTimeMs])
+		formatString: #,0.00
+		displayFolder: Waits
+		lineageTag: ea131069-d164-42dc-8b41-5635ec324929
+
+	measure 'Waits per Execution (ms)' = DIVIDE([Total Wait (ms)], [Total Executions])
+		formatString: #,0.00
+		displayFolder: Waits
+		lineageTag: e7931c15-6015-4be2-83fc-6d5567de4548
+
+	column RuntimeStatsIntervalId
+		dataType: int64
+		lineageTag: ba22970e-a6cc-4513-be4f-a03c0a68f283
+		sourceColumn: RuntimeStatsIntervalId
+
+	column TenantName
+		dataType: string
+		lineageTag: 02457f29-c93e-44fd-b119-409bcab450a8
+		sourceColumn: TenantName
+
+	column ServerName
+		dataType: string
+		lineageTag: 6accfb8e-9c9f-440f-9c94-09d9d2e69b76
+		sourceColumn: ServerName
+
+	column DatabaseName
+		dataType: string
+		lineageTag: 81a98787-ad7a-4e7f-a1bc-427ef12f2a4c
+		sourceColumn: DatabaseName
+
+	column QueryId
+		dataType: int64
+		lineageTag: 9f21ce8f-56cf-4bfc-bc42-706cc8053427
+		sourceColumn: QueryId
+
+	column PlanId
+		dataType: int64
+		lineageTag: 4a9b6c30-1df3-4868-8a81-3bd42eb5a291
+		sourceColumn: PlanId
+
+	column WaitCategory
+		dataType: string
+		lineageTag: 1d33f5de-2155-4dfd-a8e1-f511e3cf8f88
+		sourceColumn: WaitCategory
+
+	column TotalWaitTimeMs
+		dataType: double
+		lineageTag: bbaad97b-cc21-48db-8e4c-4740566351cf
+		sourceColumn: TotalWaitTimeMs
+
+	column AvgWaitTimeMs
+		dataType: double
+		lineageTag: a1b31a6e-ba4b-44b6-999d-f022bcfd95a3
+		sourceColumn: AvgWaitTimeMs
+
+	column CountWaits
+		dataType: int64
+		lineageTag: 8f072c27-3dc8-4e07-b704-1fc4e1e912e3
+		sourceColumn: CountWaits
+
+	partition FactWaitStats = calculated
+		mode: import
+		source = DATATABLE("RuntimeStatsIntervalId", INTEGER, "TenantName", STRING, "ServerName", STRING, "DatabaseName", STRING, "QueryId", INTEGER, "PlanId", INTEGER, "WaitCategory", STRING, "TotalWaitTimeMs", DOUBLE, "AvgWaitTimeMs", DOUBLE, "CountWaits", INTEGER, {{1, "DemoTenant", "DemoServer", "DemoDb", 1, 1, "CPU", 850.0, 85.0, 10}})
+

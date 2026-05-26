@@ -1,0 +1,5 @@
+C:\Source\TGQS\DBA_DWH\bin\Debug\DBA_DWH.dacpac
+C:\Source\TGQS\DBA_DWH\obj\Debug\Model.xml
+C:\Source\TGQS\DBA_DWH\obj\Debug\refactor.xml
+C:\Source\TGQS\DBA_DWH\obj\Debug\postdeploy.sql
+C:\Source\TGQS\DBA_DWH\obj\Debug\predeploy.sql

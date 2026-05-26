@@ -1,0 +1,24 @@
+relationship Rel_FactRuntimeStats_DimInterval
+	fromColumn: FactRuntimeStats.RuntimeStatsIntervalId
+	toColumn: DimInterval.RuntimeStatsIntervalId
+
+relationship Rel_FactRuntimeStats_DimQuery
+	fromColumn: FactRuntimeStats.QueryId
+	toColumn: DimQuery.QueryId
+
+relationship Rel_FactRuntimeStats_DimPlan
+	fromColumn: FactRuntimeStats.PlanId
+	toColumn: DimPlan.PlanId
+
+relationship Rel_FactWaitStats_DimInterval
+	fromColumn: FactWaitStats.RuntimeStatsIntervalId
+	toColumn: DimInterval.RuntimeStatsIntervalId
+
+relationship Rel_FactWaitStats_DimQuery
+	fromColumn: FactWaitStats.QueryId
+	toColumn: DimQuery.QueryId
+
+relationship Rel_FactWaitStats_DimPlan
+	fromColumn: FactWaitStats.PlanId
+	toColumn: DimPlan.PlanId
+

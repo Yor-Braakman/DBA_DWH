@@ -1,0 +1,27 @@
+table DimQuery
+	lineageTag: db31a2fe-3625-4317-b71a-a17c54a97e82
+
+	column QueryId
+		dataType: int64
+		lineageTag: 48639dfd-15d3-49f5-9f88-195e4ac24b02
+		sourceColumn: QueryId
+
+	column QueryTextId
+		dataType: int64
+		lineageTag: 6c053a83-210f-4a98-bbc2-bee4a65863ac
+		sourceColumn: QueryTextId
+
+	column StatementType
+		dataType: string
+		lineageTag: 073432cb-7b58-4389-ab9a-1903841dfb8a
+		sourceColumn: StatementType
+
+	column QueryHash
+		dataType: string
+		lineageTag: 25ac619d-71b7-4e60-982a-022a95300363
+		sourceColumn: QueryHash
+
+	partition DimQuery = calculated
+		mode: import
+		source = DATATABLE("QueryId", INTEGER, "QueryTextId", INTEGER, "StatementType", STRING, "QueryHash", STRING, {{1, 1, "SELECT", "hash1"}})
+

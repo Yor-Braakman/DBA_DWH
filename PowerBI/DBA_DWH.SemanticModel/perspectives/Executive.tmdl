@@ -1,0 +1,29 @@
+/// Executive report perspective for TGQS KPIs
+perspective Executive
+
+	perspectiveTable DimInterval
+
+	perspectiveTable DimQuery
+
+	perspectiveTable DimPlan
+
+	perspectiveTable FactRuntimeStats
+
+		perspectiveMeasure 'Total Executions'
+
+		perspectiveMeasure 'Avg Duration (ms)'
+
+		perspectiveMeasure 'Total CPU (ms)'
+
+		perspectiveMeasure 'CPU per Execution (ms)'
+
+		perspectiveMeasure 'Regression Query Count'
+
+		perspectiveMeasure 'Regression Rate %'
+
+	perspectiveTable FactWaitStats
+
+		perspectiveMeasure 'Total Wait (ms)'
+
+		perspectiveMeasure 'Waits per Execution (ms)'
+

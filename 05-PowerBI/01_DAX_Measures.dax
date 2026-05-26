@@ -1,0 +1,402 @@
+// ================================================================================
+// Power BI DAX Measures - Query Store Historical Analysis
+// Purpose: Define key measures for DBA reporting dashboard
+// Author: GitHub Copilot
+// Date: 2026-05-26
+// ================================================================================
+
+// Note: These measures should be added to your Power BI data model
+// after connecting to the views created in 03-DataModeling
+
+// ============================================================================
+// BASIC PERFORMANCE METRICS
+// ============================================================================
+
+// Average Query Duration (in seconds)
+Measure: Avg Duration (seconds)
+DAX:
+Avg Duration (seconds) = 
+AVERAGE(FactRuntimeStats[AvgDurationSeconds])
+
+// Maximum Query Duration (in milliseconds)
+Measure: Max Duration (ms)
+DAX:
+Max Duration (ms) = 
+MAX(FactRuntimeStats[MaxDurationMs])
+
+// Total Execution Count
+Measure: Total Executions
+DAX:
+Total Executions = 
+SUM(FactRuntimeStats[CountExecutions])
+
+// Average CPU Time (in seconds)
+Measure: Avg CPU Time (seconds)
+DAX:
+Avg CPU Time (seconds) = 
+AVERAGE(FactRuntimeStats[AvgCpuTimeSeconds])
+
+// Max CPU Time (in milliseconds)
+Measure: Max CPU Time (ms)
+DAX:
+Max CPU Time (ms) = 
+MAX(FactRuntimeStats[MaxCpuTimeMs])
+
+// Average Logical IO Reads
+Measure: Avg Logical Reads
+DAX:
+Avg Logical Reads = 
+AVERAGE(FactRuntimeStats[AvgLogicalIoReads])
+
+// Average Physical IO Reads
+Measure: Avg Physical Reads
+DAX:
+Avg Physical Reads = 
+AVERAGE(FactRuntimeStats[AvgPhysicalIoReads])
+
+// Average Memory Used (MB)
+Measure: Avg Memory (MB)
+DAX:
+Avg Memory (MB) = 
+AVERAGE(FactRuntimeStats[AvgMemoryUsedMb])
+
+// ============================================================================
+// AGGREGATED METRICS
+// ============================================================================
+
+// Total CPU Hours (aggregated)
+Measure: Total CPU Hours
+DAX:
+Total CPU Hours = 
+SUMX(
+    VALUES(FactRuntimeStats[QueryDimKey]),
+    SUM(FactRuntimeStats[CountExecutions]) * AVERAGE(FactRuntimeStats[AvgCpuTimeMs]) / 1000.0 / 3600.0
+)
+
+// Total Elapsed Time (hours)
+Measure: Total Elapsed Hours
+DAX:
+Total Elapsed Hours = 
+SUMX(
+    VALUES(FactRuntimeStats[QueryDimKey]),
+    SUM(FactRuntimeStats[CountExecutions]) * AVERAGE(FactRuntimeStats[AvgDurationMs]) / 1000.0 / 3600.0
+)
+
+// Total Wait Time (minutes)
+Measure: Total Wait Time (minutes)
+DAX:
+Total Wait Time (minutes) = 
+SUMX(
+    VALUES(FactWaitStats[QueryDimKey]),
+    SUM(FactWaitStats[TotalWaitTimeMinutes])
+)
+
+// ============================================================================
+// PERFORMANCE COMPARISON METRICS
+// ============================================================================
+
+// Period-over-Period Duration Change
+Measure: Duration Change (%)
+DAX:
+Duration Change (%) = 
+VAR CurrentPeriod = [Avg Duration (seconds)]
+VAR PreviousPeriod = CALCULATE([Avg Duration (seconds)], PREVIOUSPERIOD(DimInterval[IntervalDate]))
+RETURN
+IF(
+    ISBLANK(PreviousPeriod),
+    BLANK(),
+    DIVIDE(CurrentPeriod - PreviousPeriod, PreviousPeriod, 0) * 100
+)
+
+// CPU Time Change
+Measure: CPU Change (%)
+DAX:
+CPU Change (%) = 
+VAR CurrentPeriod = [Avg CPU Time (seconds)]
+VAR PreviousPeriod = CALCULATE([Avg CPU Time (seconds)], PREVIOUSPERIOD(DimInterval[IntervalDate]))
+RETURN
+IF(
+    ISBLANK(PreviousPeriod),
+    BLANK(),
+    DIVIDE(CurrentPeriod - PreviousPeriod, PreviousPeriod, 0) * 100
+)
+
+// Execution Count Trend
+Measure: Execution Count Change (%)
+DAX:
+Execution Count Change (%) = 
+VAR CurrentPeriod = [Total Executions]
+VAR PreviousPeriod = CALCULATE([Total Executions], PREVIOUSPERIOD(DimInterval[IntervalDate]))
+RETURN
+IF(
+    ISBLANK(PreviousPeriod),
+    BLANK(),
+    DIVIDE(CurrentPeriod - PreviousPeriod, PreviousPeriod, 0) * 100
+)
+
+// ============================================================================
+// WAIT ANALYSIS METRICS
+// ============================================================================
+
+// Total Wait Time by Category (hours)
+Measure: Wait Time by Category (hours)
+DAX:
+Wait Time by Category (hours) = 
+SUMX(
+    VALUES(FactWaitStats[WaitCategory]),
+    SUM(FactWaitStats[TotalWaitTimeMinutes]) / 60.0
+)
+
+// CPU Wait Percentage
+Measure: CPU Wait %
+DAX:
+CPU Wait % = 
+DIVIDE(
+    CALCULATE(
+        [Total Wait Time (minutes)],
+        FILTER(FactWaitStats, FactWaitStats[WaitCategoryGroup] = "CPU Contention")
+    ),
+    [Total Wait Time (minutes)],
+    0
+) * 100
+
+// Memory Wait Percentage
+Measure: Memory Wait %
+DAX:
+Memory Wait % = 
+DIVIDE(
+    CALCULATE(
+        [Total Wait Time (minutes)],
+        FILTER(FactWaitStats, FactWaitStats[WaitCategoryGroup] = "Memory Pressure")
+    ),
+    [Total Wait Time (minutes)],
+    0
+) * 100
+
+// IO Wait Percentage
+Measure: IO Wait %
+DAX:
+IO Wait % = 
+DIVIDE(
+    CALCULATE(
+        [Total Wait Time (minutes)],
+        FILTER(FactWaitStats, FactWaitStats[WaitCategoryGroup] = "IO Contention")
+    ),
+    [Total Wait Time (minutes)],
+    0
+) * 100
+
+// Average Wait Time (ms)
+Measure: Avg Wait Time (ms)
+DAX:
+Avg Wait Time (ms) = 
+AVERAGE(FactWaitStats[AvgWaitTimeMs])
+
+// Maximum Wait Time (ms)
+Measure: Max Wait Time (ms)
+DAX:
+Max Wait Time (ms) = 
+MAX(FactWaitStats[MaxWaitTimeMs])
+
+// ============================================================================
+// REGRESSION & QUALITY METRICS
+// ============================================================================
+
+// Count of Regression-Flagged Queries
+Measure: Regression Count
+DAX:
+Regression Count = 
+CALCULATE(
+    COUNTROWS(FactRuntimeStats),
+    FILTER(FactRuntimeStats, FactRuntimeStats[IsRegression] = TRUE())
+)
+
+// Percentage of Queries with Regressions
+Measure: Regression % of Queries
+DAX:
+Regression % of Queries = 
+DIVIDE(
+    [Regression Count],
+    DISTINCTCOUNT(FactRuntimeStats[QueryDimKey]),
+    0
+) * 100
+
+// Count of Distinct Plans per Query
+Measure: Avg Plans per Query
+DAX:
+Avg Plans per Query = 
+DIVIDE(
+    DISTINCTCOUNT(FactRuntimeStats[PlanDimKey]),
+    DISTINCTCOUNT(FactRuntimeStats[QueryDimKey]),
+    0
+)
+
+// ============================================================================
+// EFFICIENCY METRICS
+// ============================================================================
+
+// CPU as Percentage of Elapsed Time
+Measure: CPU % of Elapsed
+DAX:
+CPU % of Elapsed = 
+DIVIDE(
+    SUM(FactRuntimeStats[AvgCpuTimeMs]),
+    SUM(FactRuntimeStats[AvgDurationMs]),
+    0
+) * 100
+
+// Rows per Execution
+Measure: Avg Rows per Execution
+DAX:
+Avg Rows per Execution = 
+AVERAGE(FactRuntimeStats[AvgRowCount])
+
+// IO per Execution (Reads)
+Measure: Avg IO per Execution
+DAX:
+Avg IO per Execution = 
+AVERAGE(FactRuntimeStats[AvgLogicalIoReads]) + AVERAGE(FactRuntimeStats[AvgLogicalIoWrites])
+
+// Memory per Execution (MB)
+Measure: Avg Memory per Execution (MB)
+DAX:
+Avg Memory per Execution (MB) = 
+AVERAGE(FactRuntimeStats[AvgMemoryUsedMb])
+
+// ============================================================================
+// ALERTING & THRESHOLD METRICS
+// ============================================================================
+
+// Count of Slow Queries (>1000ms)
+Measure: Slow Query Count (>1s)
+DAX:
+Slow Query Count (>1s) = 
+CALCULATE(
+    DISTINCTCOUNT(FactRuntimeStats[QueryDimKey]),
+    FILTER(FactRuntimeStats, FactRuntimeStats[AvgDurationMs] > 1000)
+)
+
+// Count of High Memory Queries (>100MB)
+Measure: High Memory Query Count (>100MB)
+DAX:
+High Memory Query Count (>100MB) = 
+CALCULATE(
+    DISTINCTCOUNT(FactRuntimeStats[QueryDimKey]),
+    FILTER(FactRuntimeStats, FactRuntimeStats[AvgMemoryUsedMb] > 100)
+)
+
+// Count of High IO Queries
+Measure: High IO Query Count (>10K reads)
+DAX:
+High IO Query Count (>10K reads) = 
+CALCULATE(
+    DISTINCTCOUNT(FactRuntimeStats[QueryDimKey]),
+    FILTER(FactRuntimeStats, FactRuntimeStats[AvgLogicalIoReads] > 10000)
+)
+
+// Queries with Plan Instability (>3 different plans)
+Measure: Plan Instability Count
+DAX:
+Plan Instability Count = 
+CALCULATE(
+    COUNTROWS(
+        FILTER(
+            ADDCOLUMNS(
+                VALUES(FactRuntimeStats[QueryDimKey]),
+                "PlanCount", DISTINCTCOUNT(FactRuntimeStats[PlanDimKey])
+            ),
+            [PlanCount] > 3
+        )
+    )
+)
+
+// ============================================================================
+// RANKING & TOP-N METRICS
+// ============================================================================
+
+// Rank by Duration
+Measure: Duration Rank
+DAX:
+Duration Rank = 
+RANKX(
+    ALL(DimQuery[QueryDimKey]),
+    [Avg Duration (seconds)],,DESC
+)
+
+// Rank by CPU Time
+Measure: CPU Rank
+DAX:
+CPU Rank = 
+RANKX(
+    ALL(DimQuery[QueryDimKey]),
+    [Avg CPU Time (seconds)],,DESC
+)
+
+// Rank by Execution Count
+Measure: Execution Count Rank
+DAX:
+Execution Count Rank = 
+RANKX(
+    ALL(DimQuery[QueryDimKey]),
+    [Total Executions],,DESC
+)
+
+// ============================================================================
+// CLUSTER & TENANT COMPARISON METRICS
+// ============================================================================
+
+// Server Count
+Measure: Server Count
+DAX:
+Server Count = 
+DISTINCTCOUNT(FactRuntimeStats[ServerName])
+
+// Database Count
+Measure: Database Count
+DAX:
+Database Count = 
+DISTINCTCOUNT(FactRuntimeStats[DatabaseName])
+
+// Tenant Count
+Measure: Tenant Count
+DAX:
+Tenant Count = 
+DISTINCTCOUNT(FactRuntimeStats[TenantName])
+
+// Server Duration Variance
+Measure: Server Duration Variance
+DAX:
+Server Duration Variance = 
+SUMPRODUCT(
+    (CALCULATE([Avg Duration (seconds)], REMOVEFILTERS(FactRuntimeStats[ServerName])) - [Avg Duration (seconds)]) ^ 2
+) / COALESCE([Server Count], 1)
+
+// ============================================================================
+// RECOMMENDATIONS
+// ============================================================================
+
+// Critical Queries (Slow AND High CPU AND High Memory)
+Measure: Critical Query Count
+DAX:
+Critical Query Count = 
+CALCULATE(
+    DISTINCTCOUNT(FactRuntimeStats[QueryDimKey]),
+    FILTER(
+        FactRuntimeStats,
+        FactRuntimeStats[AvgDurationMs] > 1000
+        && FactRuntimeStats[AvgCpuTimeMs] > 500
+        && FactRuntimeStats[AvgMemoryUsedMb] > 100
+    )
+)
+
+// Queries Requiring Index Review
+Measure: Index Review Candidates
+DAX:
+Index Review Candidates = 
+CALCULATE(
+    DISTINCTCOUNT(FactRuntimeStats[QueryDimKey]),
+    FILTER(
+        FactRuntimeStats,
+        (FactRuntimeStats[AvgLogicalIoReads] > 10000 && FactRuntimeStats[AvgRowCount] < 100)
+    )
+)

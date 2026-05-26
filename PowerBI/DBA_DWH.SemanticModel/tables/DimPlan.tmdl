@@ -1,0 +1,27 @@
+table DimPlan
+	lineageTag: c2a21f68-932b-4b2d-be20-425934f3362a
+
+	column PlanId
+		dataType: int64
+		lineageTag: b5ba7893-a573-451a-8284-c84cbe1182f0
+		sourceColumn: PlanId
+
+	column QueryId
+		dataType: int64
+		lineageTag: 92454b19-f2c8-40ff-ac5f-20b235c34729
+		sourceColumn: QueryId
+
+	column EngineVersion
+		dataType: string
+		lineageTag: 67ee5e76-4bb8-437c-b950-3a2a382a89f2
+		sourceColumn: EngineVersion
+
+	column CompatibilityLevel
+		dataType: int64
+		lineageTag: 49503077-e7c2-4c3f-9f2a-2146d4d6348d
+		sourceColumn: CompatibilityLevel
+
+	partition DimPlan = calculated
+		mode: import
+		source = DATATABLE("PlanId", INTEGER, "QueryId", INTEGER, "EngineVersion", STRING, "CompatibilityLevel", INTEGER, {{1, 1, "SQL2022", 160}})
+

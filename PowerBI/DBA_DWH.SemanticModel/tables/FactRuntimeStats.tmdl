@@ -1,0 +1,112 @@
+table FactRuntimeStats
+	lineageTag: 146621bf-150a-44ba-9695-a853ef5df121
+
+	measure 'Total Executions' = SUM(FactRuntimeStats[CountExecutions])
+		formatString: #,0
+		displayFolder: Performance
+		lineageTag: 7cb20947-f5f9-43bf-9b24-3965e58907b9
+
+	measure 'Avg Duration (ms)' = AVERAGE(FactRuntimeStats[AvgDurationMs])
+		formatString: #,0.00
+		displayFolder: Performance
+		lineageTag: b2bf684f-6e92-43a9-9ba2-5aac700083fc
+
+	measure 'Total CPU (ms)' = SUMX(FactRuntimeStats, FactRuntimeStats[AvgCpuTimeMs] * FactRuntimeStats[CountExecutions])
+		formatString: #,0.00
+		displayFolder: Performance
+		lineageTag: 8d0b6cd7-69a5-4f0d-8f13-0f800d8cf168
+
+	measure 'CPU per Execution (ms)' = DIVIDE([Total CPU (ms)], [Total Executions])
+		formatString: #,0.00
+		displayFolder: Efficiency
+		lineageTag: b3998472-7bbe-47ab-a120-81e0a2472674
+
+	measure 'Avg Logical Reads' = AVERAGE(FactRuntimeStats[AvgLogicalIoReads])
+		formatString: #,0.00
+		displayFolder: IO
+		lineageTag: 103fc451-0376-48c4-baed-fabc04fde8fc
+
+	measure 'Avg Logical Writes' = AVERAGE(FactRuntimeStats[AvgLogicalIoWrites])
+		formatString: #,0.00
+		displayFolder: IO
+		lineageTag: 0b8ad70a-40d3-4a8c-a93d-4d94fc07ad3b
+
+	measure 'Regression Query Count' = CALCULATE(DISTINCTCOUNT(FactRuntimeStats[QueryId]), FactRuntimeStats[IsRegression] = TRUE())
+		formatString: #,0
+		displayFolder: Regression
+		lineageTag: aeef5676-3a35-4eb5-b8f4-88f98d6a1d7f
+
+	measure 'Regression Rate %' = DIVIDE([Regression Query Count], DISTINCTCOUNT(FactRuntimeStats[QueryId]))
+		formatString: 0.00%
+		displayFolder: Regression
+		lineageTag: 49353d7b-5b38-411c-8045-58343b55479a
+
+	measure 'Top Query Rank by Duration' = RANKX(ALL(DimQuery[QueryId]), [Avg Duration (ms)],, DESC, DENSE)
+		formatString: #,0
+		displayFolder: Ranking
+		lineageTag: 4c5fea58-8dd1-4413-9049-53c0ce558143
+
+	column RuntimeStatsIntervalId
+		dataType: int64
+		lineageTag: c0176cd2-82ef-4828-95f5-bf1cbaacadb0
+		sourceColumn: RuntimeStatsIntervalId
+
+	column TenantName
+		dataType: string
+		lineageTag: a4720bf0-a052-4ac6-820b-62c51a072394
+		sourceColumn: TenantName
+
+	column ServerName
+		dataType: string
+		lineageTag: 6227b87e-2865-480e-b015-5d6c8be12de1
+		sourceColumn: ServerName
+
+	column DatabaseName
+		dataType: string
+		lineageTag: 4a090790-3ad8-4c98-93d4-3ec349d12431
+		sourceColumn: DatabaseName
+
+	column QueryId
+		dataType: int64
+		lineageTag: 9e59b071-caa1-4ba2-a283-84ab8acf7715
+		sourceColumn: QueryId
+
+	column PlanId
+		dataType: int64
+		lineageTag: e4a3bd46-bfe1-409f-af45-01bbd9f41078
+		sourceColumn: PlanId
+
+	column CountExecutions
+		dataType: int64
+		lineageTag: b3a1e203-0174-48e6-a2d6-82022ef4f0c5
+		sourceColumn: CountExecutions
+
+	column AvgDurationMs
+		dataType: double
+		lineageTag: 097a759e-0bd2-4397-a5c9-67d083ea5d92
+		sourceColumn: AvgDurationMs
+
+	column AvgCpuTimeMs
+		dataType: double
+		lineageTag: 8843192a-39db-4a10-87d4-35d481736968
+		sourceColumn: AvgCpuTimeMs
+
+	column AvgLogicalIoReads
+		dataType: double
+		lineageTag: c4aea98e-7f25-408d-a4ef-2cb8f8f65ba7
+		sourceColumn: AvgLogicalIoReads
+
+	column AvgLogicalIoWrites
+		dataType: double
+		lineageTag: 9480f233-830d-414b-be1a-66a90beebb34
+		sourceColumn: AvgLogicalIoWrites
+
+	column IsRegression
+		dataType: boolean
+		lineageTag: 9baa63f0-c492-4f48-b81b-b0c37a33311c
+		sourceColumn: IsRegression
+
+	partition FactRuntimeStats = calculated
+		mode: import
+		source = DATATABLE("RuntimeStatsIntervalId", INTEGER, "TenantName", STRING, "ServerName", STRING, "DatabaseName", STRING, "QueryId", INTEGER, "PlanId", INTEGER, "CountExecutions", INTEGER, "AvgDurationMs", DOUBLE, "AvgCpuTimeMs", DOUBLE, "AvgLogicalIoReads", DOUBLE, "AvgLogicalIoWrites", DOUBLE, "IsRegression", BOOLEAN, {{1, "DemoTenant", "DemoServer", "DemoDb", 1, 1, 10, 125.5, 42.2, 18.0, 4.0, FALSE}})
+
